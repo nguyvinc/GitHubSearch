@@ -9,6 +9,15 @@ import android.widget.TextView;
 
 public class GitHubSearchAdapter extends RecyclerView.Adapter<GitHubSearchAdapter.SearchResultViewHolder> {
     private GitHubUtils.GitHubRepo[] mRepos;
+    OnSearchItemClickListener mSearchItemClickListener;
+
+    public interface OnSearchItemClickListener {
+        void onSearchItemClick(GitHubUtils.GitHubRepo repo);
+    }
+
+    GitHubSearchAdapter(OnSearchItemClickListener searchItemClickListener){
+        mSearchItemClickListener = searchItemClickListener;
+    }
 
     public void updateSearchResults(GitHubUtils.GitHubRepo[] repos) {
         mRepos = repos;
@@ -43,6 +52,14 @@ public class GitHubSearchAdapter extends RecyclerView.Adapter<GitHubSearchAdapte
         public SearchResultViewHolder(View itemView) {
             super(itemView);
             mSearchResultTV = (TextView)itemView.findViewById(R.id.tv_search_result);
+
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    GitHubUtils.GitHubRepo searchResult = mRepos[getAdapterPosition()];
+                    mSearchItemClickListener.onSearchItemClick(searchResult);
+                }
+            });
         }
 
         public void bind(GitHubUtils.GitHubRepo repo) {

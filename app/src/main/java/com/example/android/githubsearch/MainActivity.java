@@ -1,5 +1,6 @@
 package com.example.android.githubsearch;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GitHubSearchAdapter.OnSearchItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLoadingErrorTV;
     private ProgressBar mLoadingPB;
     private GitHubSearchAdapter mGitHubSearchAdapter;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         mSearchResultsRV.setLayoutManager(new LinearLayoutManager(this));
         mSearchResultsRV.setHasFixedSize(true);
 
-        mGitHubSearchAdapter = new GitHubSearchAdapter();
+        mGitHubSearchAdapter = new GitHubSearchAdapter(this);
         mSearchResultsRV.setAdapter(mGitHubSearchAdapter);
 
         Button searchButton = findViewById(R.id.btn_search);
@@ -57,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
         String url = GitHubUtils.buildGitHubSearchURL(query);
         Log.d(TAG, "querying search URL: " + url);
         new GitHubSearchTask().execute(url);
+    }
+
+    @Override
+    public void onSearchItemClick(GitHubUtils.GitHubRepo repo) {
+        Intent intent = new Intent(this, RepoDetailActivity.class);
+        intent.putExtra(GitHubUtils.EXTRA_GITHUB_REPO, repo);
+        startActivity(intent);
     }
 
     class GitHubSearchTask extends AsyncTask<String, Void, String> {
